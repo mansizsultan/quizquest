@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -8,10 +9,10 @@ function Navbar() {
     }
 
     return (
-        <nav className="bg-white p-4 shadow-md">
+        <nav className="bg-white p-4 shadow-md fixed top-0 left-0 right-0 z-10">
             <div className='flex items-center justify-between'>
                 {/* LOGO */}
-                <div className="text-blue-800 text-3xl font-bold px-6">QuizQuest</div>
+                <Link to="/" className="text-blue-800 text-3xl font-bold px-6">QuizQuest</Link>
 
                 <div className="md:hidden">
                     <button className='text-blue-800' onClick={toggleMenu}>
@@ -31,34 +32,40 @@ function Navbar() {
 
                 <ul className="hidden md:flex space-x-4">
                     <li>
-                        <a href="#" className="
-                            text-blue-800 px-6 py-2 font-bold relative inline-block
-                            transition-all duration-300 ease-in-out
-                            hover:bg-blue-200 hover:rounded-lg hover:bg-opacity-50 hover:scale-105
+                        <Link
+                            to="/"
+                            className="
+                                text-blue-800 px-6 py-2 font-bold relative inline-block
+                                transition-all duration-300 ease-in-out
+                                hover:bg-blue-200 hover:rounded-lg hover:bg-opacity-50 hover:scale-105
                             "
                         >
                         Home
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="#" className="
-                            text-blue-800 px-6 py-2 font-bold relative inline-block
-                            transition-all duration-300 ease-in-out
-                            hover:bg-blue-200 hover:rounded-lg hover:bg-opacity-50 hover:scale-105
+                        <Link
+                            to="/quizzes"
+                            className="
+                                text-blue-800 px-6 py-2 font-bold relative inline-block
+                                transition-all duration-300 ease-in-out
+                                hover:bg-blue-200 hover:rounded-lg hover:bg-opacity-50 hover:scale-105
                             "
                         >
-                        Tryout List
-                        </a>
+                        Daftar Kuis
+                        </Link>
                     </li>
                     <li>
-                        <a href="#" className="
-                            text-blue-800 px-6 py-2 font-bold relative inline-block
-                            transition-all duration-300 ease-in-out
-                            hover:bg-blue-200 hover:rounded-lg hover:bg-opacity-50 hover:scale-105
+                        <Link
+                            to="#"
+                            className="
+                                text-blue-800 px-6 py-2 font-bold relative inline-block
+                                transition-all duration-300 ease-in-out
+                                hover:bg-blue-200 hover:rounded-lg hover:bg-opacity-50 hover:scale-105
                             "
                         >
-                        Your Tryout
-                        </a>
+                        Kuis Kamu
+                        </Link>
                     </li>
                 </ul>
 
@@ -66,9 +73,9 @@ function Navbar() {
             {/* MOBILE VIEW */}
             {isMenuOpen ? (
                 <ul className='flex-col md:hidden text-center'>
-                    <li className='py-4'><a href='#' className='text-blue-800 px-6 font-bold'>Home</a></li>
-                    <li className='py-4'><a href='#' className='text-blue-800 px-6 font-bold'>Tryout List</a></li>
-                    <li className='py-4'><a href='#' className='text-blue-800 px-6 font-bold'>Your Tryout</a></li>
+                    <li className='py-4'><Link to='/' className='text-blue-800 px-6 font-bold'>Home</Link></li>
+                    <li className='py-4'><Link to='/quizzes' className='text-blue-800 px-6 font-bold'>Daftar Kuis</Link></li>
+                    <li className='py-4'><Link to='#' className='text-blue-800 px-6 font-bold'>Kuis Kamu</Link></li>
                 </ul>
             ) : null}
         </nav>
