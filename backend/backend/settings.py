@@ -46,8 +46,10 @@ INSTALLED_APPS = [
     # EXTERNAL APPS
     "corsheaders",
     "rest_framework",
+    "autoslug",
 
     # INTENRAL APPS
+    "quiz",
 ]
 
 MIDDLEWARE = [
