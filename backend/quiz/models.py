@@ -2,9 +2,22 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Quiz(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='quizzes')
+    # Kategori yang tersedia
+    CATEGORY_CHOICES = [
+        ('PU', 'Pengetahuan Umum'),
+        ('ED', 'Edukasi'),
+        ('HI', 'Hiburan'),
+        ('BA', 'Bahasa'),
+        ('KE', 'Kesehatan'),
+        ('OL', 'Olahraga'),
+        ('BU', 'Budaya'),
+        ('TE', 'Teknologi'),
+    ]
+
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='quizzes', default=1)
     title = models.CharField("Quiz Title", max_length=255, default="New Quiz")
     description = models.TextField()
+    category = models.CharField(max_length=2, choices=CATEGORY_CHOICES, default='PU') 
     created_at = models.DateTimeField(auto_now_add=True)
     is_editable = models.BooleanField(default=True)
 
@@ -19,7 +32,7 @@ class Quiz(models.Model):
 
     def __str__(self):
         return self.title
-
+    
 class Question(models.Model):
     QUESTION_TYPES = [
         ('TF', 'True/False'),
