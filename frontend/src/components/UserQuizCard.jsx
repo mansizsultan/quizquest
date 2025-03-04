@@ -1,8 +1,8 @@
-// src/components/QuizCard.jsx
+// src/components/UserQuizCard.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 
-const QuizCard = ({ quiz }) => {
+const UserQuizCard = ({ quiz }) => {
   // Function untuk mendapatkan label kategori dari kode
   const getCategoryLabel = (categoryCode) => {
     const categories = {
@@ -28,24 +28,33 @@ const QuizCard = ({ quiz }) => {
           </span>
         </div>
         <p className="text-gray-600 mt-2">{quiz.description}</p>
-        <p className="text-gray-500 mt-2">Jumlah soal: {quiz.questionCount}</p>
+        <div className="flex justify-between items-center mt-2">
+          <p className="text-gray-500">Jumlah soal: {quiz.questionCount}</p>
+          <p className="text-gray-500">Dibuat: {quiz.created_at}</p>
+        </div>
         <div className="mt-4 flex space-x-2">
           <Link
-            to={`/quiz/${quiz.id}`}
+            to={`/quiz/${quiz.id}/edit`}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+          >
+            Edit Kuis
+          </Link>
+          <Link
+            to={`/quiz/${quiz.id}`}
+            className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
           >
             Lihat Detail
           </Link>
-          <Link
-            // to={`/quiz/${quiz.id}/start`}
-            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+          <button
+            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+            onClick={() => window.confirm("Apakah Anda yakin ingin menghapus kuis ini?")}
           >
-            Kerjakan Kuis
-          </Link>
+            Hapus
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
-export default QuizCard;
+export default UserQuizCard;

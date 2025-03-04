@@ -5,6 +5,8 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import QuizList from "./pages/QuizList";
 import QuizDetail from "./pages/QuizDetail";
+import UserQuiz from "./pages/UserQuiz";
+import CreateQuiz from "./pages/CreateQuiz"; 
 
 const App = () => {
   return (
@@ -44,7 +46,10 @@ const App = () => {
                       <p className="text-gray-600 text-sm">Kerjakan kuis dan tantang dirimu!</p>
                     </div>
                   </Link>
-                  <div className="w-64 bg-white shadow-xl rounded-xl overflow-hidden transition duration-300 transform hover:shadow-[0_0_20px_#1E40AF]">
+                  <Link
+                    to="/user-quizzes"
+                    className="w-64 bg-white shadow-xl rounded-xl overflow-hidden transition duration-300 transform hover:shadow-[0_0_20px_#1E40AF]"
+                  >
                     <img
                       src="images/plus.jpg"
                       alt="Buat Kuis"
@@ -54,13 +59,15 @@ const App = () => {
                       <h3 className="text-lg font-semibold text-gray-900">Buat Kuis</h3>
                       <p className="text-gray-600 text-sm">Buat kuismu sendiri dan bagikan!</p>
                     </div>
-                  </div>
+                  </Link>
                 </div>
               </div>
             }
           />
           <Route path="/quizzes" element={<QuizList />} />
           <Route path="/quiz/:id" element={<QuizDetail />} />
+          <Route path="/user-quizzes" element={<UserQuiz />} />
+          <Route path="/create-quiz" element={<CreateQuiz />} /> 
         </Routes>
 
         {/* FOOTER */}

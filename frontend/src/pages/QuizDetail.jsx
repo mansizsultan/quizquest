@@ -5,7 +5,22 @@ import { useParams, Link } from "react-router-dom";
 const QuizDetail = () => {
   const { id } = useParams(); // Ambil ID kuis dari URL
 
-  // Data kuis dummy dengan tambahan jumlah soal
+  // Function untuk mendapatkan label kategori dari kode
+  const getCategoryLabel = (categoryCode) => {
+    const categories = {
+      'PU': 'Pengetahuan Umum',
+      'ED': 'Edukasi',
+      'HI': 'Hiburan',
+      'BA': 'Bahasa',
+      'KE': 'Kesehatan',
+      'OL': 'Olahraga',
+      'BU': 'Budaya',
+      'TE': 'Teknologi',
+    };
+    return categories[categoryCode] || 'Tidak Terkategori';
+  };
+
+  // Data kuis dummy dengan tambahan jumlah soal dan kategori
   const quizzes = [
     {
       id: 1,
@@ -13,7 +28,8 @@ const QuizDetail = () => {
       description: "Kuis ini berisi soal-soal matematika dasar.",
       author: "John Doe",
       created_at: "2023-10-01",
-      questionCount: 10
+      questionCount: 10,
+      category: "ED" // Edukasi
     },
     {
       id: 2,
@@ -21,7 +37,8 @@ const QuizDetail = () => {
       description: "Kuis ini berisi soal-soal sejarah Indonesia.",
       author: "Jane Doe",
       created_at: "2023-10-02",
-      questionCount: 15
+      questionCount: 15,
+      category: "PU" // Pengetahuan Umum
     },
     {
       id: 3,
@@ -29,7 +46,8 @@ const QuizDetail = () => {
       description: "Kuis ini berisi soal-soal IPA untuk kelas 6 SD.",
       author: "Alice",
       created_at: "2023-10-03",
-      questionCount: 20
+      questionCount: 20,
+      category: "ED" // Edukasi
     },
   ];
 
@@ -62,12 +80,18 @@ const QuizDetail = () => {
           <h1 className="text-4xl font-bold text-center text-blue-800">Detail Kuis</h1>
         </div>
         <div className="w-full max-w-4xl mt-6 px-4 bg-white p-6 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">{quiz.title}</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold text-gray-900">{quiz.title}</h2>
+            <span className="px-4 py-1 bg-blue-100 text-blue-800 rounded-full">
+              {getCategoryLabel(quiz.category)}
+            </span>
+          </div>
           <p className="text-gray-700">{quiz.description}</p>
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <p className="text-gray-600">Dibuat oleh: {quiz.author}</p>
               <p className="text-gray-600">Tanggal dibuat: {quiz.created_at}</p>
+              <p className="text-gray-600">Kategori: {getCategoryLabel(quiz.category)}</p>
             </div>
             <div>
               <p className="text-gray-600">Jumlah soal: {quiz.questionCount}</p>

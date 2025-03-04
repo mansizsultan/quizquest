@@ -57,7 +57,7 @@ function Navbar() {
                     </li>
                     <li>
                         <Link
-                            to="#"
+                            to="/user-quizzes"
                             className="
                                 text-blue-800 px-6 py-2 font-bold relative inline-block
                                 transition-all duration-300 ease-in-out
@@ -75,7 +75,7 @@ function Navbar() {
                 <ul className='flex-col md:hidden text-center'>
                     <li className='py-4'><Link to='/' className='text-blue-800 px-6 font-bold'>Home</Link></li>
                     <li className='py-4'><Link to='/quizzes' className='text-blue-800 px-6 font-bold'>Daftar Kuis</Link></li>
-                    <li className='py-4'><Link to='#' className='text-blue-800 px-6 font-bold'>Kuis Kamu</Link></li>
+                    <li className='py-4'><Link to='/user-quizzes' className='text-blue-800 px-6 font-bold'>Kuis Kamu</Link></li>
                 </ul>
             ) : null}
         </nav>
