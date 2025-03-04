@@ -1,32 +1,30 @@
 import axios from "axios";
+import { ACCESS_TOKEN } from "./constants";
 
-const API_BASE_URL = "http://localhost:8000/api"; // Sesuaikan dengan URL backend Anda
+const apiUrl = "http://localhost:8000/"; 
 
-// Fungsi untuk membuat quiz baru
-export const createQuiz = async (quizData) => {
-  try {
-    const response = await axios.post(`${API_BASE_URL}/quizzes/`, quizData, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`, // Jika menggunakan autentikasi
-      },
-    });
-    return response.data;
-  } catch (error) {
-    throw new Error(error.response?.data?.detail || "Gagal membuat quiz");
+const api = axios.create({
+  baseURL: apiUrl,
+});
+
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem(ACCESS_TOKEN);
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
+);
+
+export const logout = () => {
+  localStorage.removeItem(ACCESS_TOKEN);
+  localStorage.removeItem(REFRESH_TOKEN);
+  localStorage.removeItem("username");
+  if (setUsername) setUsername(null);   
 };
 
-// Fungsi untuk mengambil daftar quiz
-export const getQuizzes = async () => {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/quizzes/`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`, // Jika menggunakan autentikasi
-      },
-    });
-    return response.data;
-  } catch (error) {
-    throw new Error(error.response?.data?.detail || "Gagal mengambil quiz");
-  }
-};
+export default api;

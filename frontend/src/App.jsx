@@ -1,6 +1,9 @@
 // src/App.jsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Login from "./pages/Login"
+import Register from "./pages/Register"
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import QuizList from "./pages/QuizList";
@@ -64,6 +67,8 @@ const App = () => {
               </div>
             }
           />
+          <Route path="/login" element={<Login />} />    
+          <Route path="/register" element={<Register />} />     
           <Route path="/quizzes" element={<QuizList />} />
           <Route path="/quiz/:id" element={<QuizDetail />} />
           <Route path="/user-quizzes" element={<UserQuiz />} />
