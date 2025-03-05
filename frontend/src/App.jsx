@@ -1,9 +1,8 @@
-// src/App.jsx
-import React from "react";
+import React, { useContext } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Login from "./pages/Login"
-import Register from "./pages/Register"
+import { AuthContext } from "./context/AuthContext"; 
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import QuizList from "./pages/QuizList";
@@ -12,6 +11,8 @@ import UserQuiz from "./pages/UserQuiz";
 import CreateQuiz from "./pages/CreateQuiz"; 
 
 const App = () => {
+  const { isAuthenticated, username } = useContext(AuthContext);
+
   return (
     <Router>
       <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-300 to-white pt-16">
@@ -26,7 +27,8 @@ const App = () => {
               <div className="flex flex-col items-center justify-start flex-grow pt-8">
                 <h1 className="text-4xl font-bold text-center">
                   <span className="text-black">Selamat datang di </span>
-                  <span className="text-blue-800">QuizQuest!</span>
+                  <span className="text-blue-800">QuizQuest</span>
+                  {isAuthenticated && username ? `, ${username}!` : "!"}
                 </h1>
                 <p className="text-xl text-gray-800 mt-2 text-center">
                   Jelajahi, Ciptakan, dan Pelajari Kuis Seru Setiap Hari!

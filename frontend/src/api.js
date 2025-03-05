@@ -1,5 +1,6 @@
 import axios from "axios";
-import { ACCESS_TOKEN } from "./constants";
+import { jwtDecode } from "jwt-decode"
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "./constants";
 
 const apiUrl = "http://localhost:8000/"; 
 
@@ -11,7 +12,12 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem(ACCESS_TOKEN);
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      const decoded = jwtDecode(token)
+      const expiry_date = decoded.exp 
+      const current_time = Date.now() / 1000
+      if (expiry_date > current_time) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
@@ -19,12 +25,5 @@ api.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-
-export const logout = () => {
-  localStorage.removeItem(ACCESS_TOKEN);
-  localStorage.removeItem(REFRESH_TOKEN);
-  localStorage.removeItem("username");
-  if (setUsername) setUsername(null);   
-};
 
 export default api;

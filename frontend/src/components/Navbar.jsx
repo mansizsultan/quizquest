@@ -1,11 +1,21 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext"; // Pastikan Anda mengimpor AuthContext dari file yang sesuai
 
 function Navbar() {
+  const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("ACCESS_TOKEN");
+    localStorage.removeItem("REFRESH_TOKEN");
+    setIsAuthenticated(false);
+    navigate("/");
   };
 
   return (
@@ -32,15 +42,15 @@ function Navbar() {
           </button>
         </div>
 
-        <ul className="hidden md:flex space-x-4">
+        <ul className="hidden md:flex space-x-4 items-center">
           <li>
             <Link
               to="/"
               className="
-                                text-blue-800 px-6 py-2 font-bold relative inline-block
-                                transition-all duration-300 ease-in-out
-                                hover:bg-blue-200 hover:rounded-lg hover:bg-opacity-50 hover:scale-105
-                            "
+                text-blue-800 px-6 py-2 font-bold relative inline-block
+                transition-all duration-300 ease-in-out
+                hover:bg-blue-200 hover:rounded-lg hover:bg-opacity-50 hover:scale-105
+              "
             >
               Home
             </Link>
@@ -49,10 +59,10 @@ function Navbar() {
             <Link
               to="/quizzes"
               className="
-                                text-blue-800 px-6 py-2 font-bold relative inline-block
-                                transition-all duration-300 ease-in-out
-                                hover:bg-blue-200 hover:rounded-lg hover:bg-opacity-50 hover:scale-105
-                            "
+                text-blue-800 px-6 py-2 font-bold relative inline-block
+                transition-all duration-300 ease-in-out
+                hover:bg-blue-200 hover:rounded-lg hover:bg-opacity-50 hover:scale-105
+              "
             >
               Daftar Kuis
             </Link>
@@ -61,14 +71,41 @@ function Navbar() {
             <Link
               to="/user-quizzes"
               className="
-                                text-blue-800 px-6 py-2 font-bold relative inline-block
-                                transition-all duration-300 ease-in-out
-                                hover:bg-blue-200 hover:rounded-lg hover:bg-opacity-50 hover:scale-105
-                            "
+                text-blue-800 px-6 py-2 font-bold relative inline-block
+                transition-all duration-300 ease-in-out
+                hover:bg-blue-200 hover:rounded-lg hover:bg-opacity-50 hover:scale-105
+              "
             >
               Kuis Kamu
             </Link>
           </li>
+          {isAuthenticated ? (
+            <li>
+              <Link
+                onClick={handleLogout}
+                className="
+                  bg-red-500 text-white px-6 py-2 font-bold rounded-lg
+                  transition-all duration-300 ease-in-out
+                  hover:bg-red-600 hover:scale-105
+                "
+              >
+                Logout
+              </Link>
+            </li>
+          ) : (
+            <li>
+              <Link
+                to="/login"
+                className="
+                  bg-blue-500 text-white px-6 py-2 font-bold rounded-lg
+                  transition-all duration-300 ease-in-out
+                  hover:bg-blue-600 hover:scale-105
+                "
+              >
+                Login
+              </Link>
+            </li>
+          )}
         </ul>
       </div>
       {/* MOBILE VIEW */}
@@ -89,6 +126,33 @@ function Navbar() {
               Kuis Kamu
             </Link>
           </li>
+          {isAuthenticated ? (
+            <li className="py-4">
+              <button
+                onClick={handleLogout}
+                className="
+                  bg-red-500 text-white px-6 py-2 font-bold rounded-lg
+                  transition-all duration-300 ease-in-out
+                  hover:bg-red-600 hover:scale-105
+                "
+              >
+                Logout
+              </button>
+            </li>
+          ) : (
+            <li className="py-4">
+              <Link
+                to="/login"
+                className="
+                  bg-blue-500 text-white px-6 py-2 font-bold rounded-lg
+                  transition-all duration-300 ease-in-out
+                  hover:bg-blue-600 hover:scale-105
+                "
+              >
+                Login
+              </Link>
+            </li>
+          )}
         </ul>
       ) : null}
     </nav>

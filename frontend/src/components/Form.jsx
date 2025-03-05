@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import api from "../api";
 import { useNavigate, Link } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
+import { AuthContext } from "../context/AuthContext";
 
 function Form({ route, method }) {
+    const { setIsAuthenticated, get_username } = useContext(AuthContext);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
@@ -14,29 +16,40 @@ function Form({ route, method }) {
     const handleSubmit = async (e) => {
         setLoading(true);
         e.preventDefault();
-
+    
         try {
+            console.log("Mengirim permintaan login..."); // Debugging
             const res = await api.post(route, { username, password });
+    
             if (method === "login") {
+                console.log("Login berhasil, menyimpan token...");
                 localStorage.setItem(ACCESS_TOKEN, res.data.access);
                 localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
+                setIsAuthenticated(true);
+    
+                console.log("Memanggil get_username...");
+                await get_username(); // Pastikan username diperbarui sebelum pindah halaman
+    
+                console.log("Navigasi ke home...");
                 navigate("/");
+                window.location.reload(); // Paksa refresh agar username langsung muncul
             } else {
                 navigate("/login");
             }
         } catch (error) {
+            console.log("Login gagal:", error);
             alert(error);
         } finally {
             setLoading(false);
         }
     };
+    
 
     return (
         <div className="h-screen flex items-center justify-center bg-gradient-to-b from-blue-300 to-white px-4">
             <div className="max-w-md w-full bg-white p-4 shadow-lg rounded-lg">
                 <div className="text-center mb-2">
                     <h1 className="text-3xl font-bold text-blue-800">QuizQuest</h1>
-
                 </div>
                 
                 <form onSubmit={handleSubmit}>
@@ -71,26 +84,14 @@ function Form({ route, method }) {
                         type="submit"
                         disabled={loading}
                     >
-                        {loading ? (
-                            <span className="flex items-center justify-center">
-                                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                Loading...
-                            </span>
-                        ) : name}
+                        {loading ? "Loading..." : name}
                     </button>
                     
                     <div className="mt-6 text-center text-gray-600">
                         {method === "login" ? (
-                            <p>
-                                Belum punya akun? <Link to="/register" className="text-blue-600 font-medium hover:underline">Daftar sekarang!</Link>
-                            </p>
+                            <p>Belum punya akun? <Link to="/register" className="text-blue-600 font-medium hover:underline">Daftar sekarang!</Link></p>
                         ) : (
-                            <p>
-                                Sudah punya akun? <Link to="/login" className="text-blue-600 font-medium hover:underline">Masuk sekarang!</Link>
-                            </p>
+                            <p>Sudah punya akun? <Link to="/login" className="text-blue-600 font-medium hover:underline">Masuk sekarang!</Link></p>
                         )}
                     </div>
                 </form>
