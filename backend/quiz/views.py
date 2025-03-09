@@ -25,7 +25,7 @@ class AllQuizzesList(generics.ListAPIView):
     def get_queryset(self):
         return Quiz.objects.all()
         
-def show_json(request):
+def show_json():
     data = Quiz.objects.all()
     serialized_data = QuizSerializer(data, many=True).data 
     return JsonResponse(serialized_data, safe=False)  
@@ -57,7 +57,6 @@ class QuizListCreate(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         quiz = serializer.save(author=self.request.user)
-        questions_data = self.request.data.get("questions", [])
         return quiz
 
 class QuizDelete(generics.DestroyAPIView):
@@ -79,3 +78,70 @@ class QuizUpdate(generics.RetrieveUpdateAPIView):
         if quiz.filter(submissions__isnull=False).exists():
             quiz.update(is_editable=False) 
         return quiz
+
+class QuizQuestion(APIView):
+
+    def get(self, quiz_id):
+        try:
+            quiz = Quiz.objects.get(id=quiz_id)
+        except Quiz.DoesNotExist:
+            return Response({"error": "Kuis tidak ditemukan!"}, status=status.HTTP_404_NOT_FOUND)
+        
+        questions = Question.objects.filter(quiz=quiz)
+        serializer = QuestionSerializer(questions, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, **kwargs):
+        try:
+            quiz = Quiz.objects.get(id=kwargs["quiz_id"])  
+        except Quiz.DoesNotExist:
+            return Response({"error": "Kuis tidak ditemukan!"}, status=status.HTTP_404_NOT_FOUND)
+        
+        if not quiz.is_editable:
+            return Response({"error": "Tidak dapat menambah pertanyaan!"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = QuestionSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()  
+            return Response(
+                {"message": "Pertanyaan berhasil dibuat!", "data": serializer.data},
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class QuizQuestionDetail(APIView):
+
+    def get_object(self, pk):
+        try:
+            return Question.objects.get(id=pk)
+        except Question.DoesNotExist:
+            raise Http404
+
+    def get(self, pk):
+        question = self.get_object(pk)
+        serializer = QuestionSerializer(question)
+        return Response(serializer.data)
+    
+    def patch(self, request, pk):
+        question = self.get_object(pk)
+        
+        if not question.quiz.is_editable:
+            return Response({"error": "Tidak dapat mengedit pertanyaan!"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = QuestionSerializer(question, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, pk):
+        question = self.get_object(pk)
+
+        if not question.quiz.is_editable:
+            return Response({"error": "Tidak dapat menghapus pertanyaan!"}, status=status.HTTP_400_BAD_REQUEST)
+
+        question.delete()
+        return Response(
+            {"message": "Pertanyaan berhasil terhapus!"},
+            status=status.HTTP_204_NO_CONTENT
+        )
