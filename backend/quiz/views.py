@@ -5,8 +5,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.http import Http404, JsonResponse
-from .models import Quiz, Question, Submission, Answer
-from .serializers import UserSerializer, QuizSerializer, QuestionSerializer
+from .models import Quiz, Question, Submission, Answer, Submission, SubmissionAnswer
+from .serializers import UserSerializer, QuizSerializer, QuestionSerializer, SubmissionSerializer
 
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -25,7 +25,7 @@ class AllQuizzesList(generics.ListAPIView):
     def get_queryset(self):
         return Quiz.objects.all()
         
-def show_json():
+def show_json(request):
     data = Quiz.objects.all()
     serialized_data = QuizSerializer(data, many=True).data 
     return JsonResponse(serialized_data, safe=False)  
@@ -66,7 +66,7 @@ class QuizDelete(generics.DestroyAPIView):
     def get_queryset(self):
         user = self.request.user
         return Quiz.objects.filter(author=user)
-    
+
 class QuizUpdate(generics.RetrieveUpdateAPIView):
     queryset = Quiz.objects.all()
     serializer_class = QuizSerializer
@@ -75,13 +75,14 @@ class QuizUpdate(generics.RetrieveUpdateAPIView):
     def get_queryset(self):
         user = self.request.user
         quiz = Quiz.objects.filter(author=user)
-        if quiz.filter(submissions__isnull=False).exists():
-            quiz.update(is_editable=False) 
         return quiz
+    
+    def perform_update(self, serializer):
+        serializer.save(author=self.request.user)
 
 class QuizQuestion(APIView):
 
-    def get(self, quiz_id):
+    def get(self, request, quiz_id, format=None):
         try:
             quiz = Quiz.objects.get(id=quiz_id)
         except Quiz.DoesNotExist:
@@ -91,9 +92,9 @@ class QuizQuestion(APIView):
         serializer = QuestionSerializer(questions, many=True)
         return Response(serializer.data)
 
-    def post(self, request, **kwargs):
+    def post(self, request, quiz_id, format=None, **kwargs):
         try:
-            quiz = Quiz.objects.get(id=kwargs["quiz_id"])  
+            quiz = Quiz.objects.get(id=quiz_id)  
         except Quiz.DoesNotExist:
             return Response({"error": "Kuis tidak ditemukan!"}, status=status.HTTP_404_NOT_FOUND)
         
@@ -117,12 +118,12 @@ class QuizQuestionDetail(APIView):
         except Question.DoesNotExist:
             raise Http404
 
-    def get(self, pk):
+    def get(self, request, pk, format=None):
         question = self.get_object(pk)
         serializer = QuestionSerializer(question)
         return Response(serializer.data)
     
-    def patch(self, request, pk):
+    def patch(self, request, pk, format=None):
         question = self.get_object(pk)
         
         if not question.quiz.is_editable:
@@ -134,7 +135,7 @@ class QuizQuestionDetail(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def delete(self, pk):
+    def delete(self, request, pk, format=None):
         question = self.get_object(pk)
 
         if not question.quiz.is_editable:
@@ -145,3 +146,4 @@ class QuizQuestionDetail(APIView):
             {"message": "Pertanyaan berhasil terhapus!"},
             status=status.HTTP_204_NO_CONTENT
         )
+    

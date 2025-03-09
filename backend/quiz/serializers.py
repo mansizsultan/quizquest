@@ -42,12 +42,9 @@ class QuestionSerializer(serializers.ModelSerializer):
         question_type = data.get('question_type')
         answers = data.get('answers', [])
 
-        if question_type == 'TF' and len(answers) != 2:
-            raise serializers.ValidationError("Soal True/False harus memiliki tepat dua jawaban (benar dan salah).")
-
         if question_type == 'MC':
-            if len(answers) != 4:
-                raise serializers.ValidationError("Soal Multiple Choice harus memiliki tepat 4 jawaban.")
+            if len(answers) < 2:
+                raise serializers.ValidationError("Soal Multiple Choice harus memiliki minimal 2 jawaban.")
             
             correct_answers = sum(1 for answer in answers if answer.get("is_right", False))
             if correct_answers != 1:
