@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     AllQuizzesList, QuizDetailView, UserQuizListView, QuizDelete, QuizUpdate,
     QuizListCreate, get_username, show_json, show_questions, 
-    QuizQuestion, QuizQuestionDetail
+    QuizQuestion, QuizQuestionDetail, SubmissionView, SubmissionDetailView
 )
 
 urlpatterns = [
@@ -18,4 +18,6 @@ urlpatterns = [
     path("create/quiz/<int:quiz_id>/questions/", QuizQuestion.as_view(), name="quiz-question-create"),
     path('quiz/<int:quiz_id>/questions/', QuizQuestion.as_view(), name='quiz-question-list'),
     path('questions/<int:pk>/', QuizQuestionDetail.as_view(), name='quiz-question-detail'),
+    path('submissions/', SubmissionView.as_view(), name='submissions-list-create'),
+    path('submissions/<int:pk>/', SubmissionDetailView.as_view(), name='submission-detail'),
 ]
