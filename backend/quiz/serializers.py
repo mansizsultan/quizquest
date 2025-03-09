@@ -11,18 +11,19 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user
-
+    
 class QuizSerializer(serializers.ModelSerializer):
     question_count = serializers.SerializerMethodField()
-    category_display = serializers.CharField(source='get_category_display', read_only=True)  # Nama baru
+    category_display = serializers.CharField(source='get_category_display', read_only=True)  
+    author_name = serializers.CharField(source="author.username", read_only=True)
 
     class Meta:
         model = Quiz
-        fields = ['id', 'author', 'title', 'description', 'category', 'category_display', 'created_at', 'question_count', 'is_editable']
+        fields = ['id', 'author', 'author_name', 'title', 'description', 'category', 'category_display', 'created_at', 'question_count', 'is_editable',]
         extra_kwargs = {"author": {"read_only": True}}
 
     def get_question_count(self, obj):
-        return obj.question_count
+        return str(obj.questions.count())
     
 class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,21 +31,28 @@ class AnswerSerializer(serializers.ModelSerializer):
         fields = ['id', 'answer_text', 'is_right']
 
 class QuestionSerializer(serializers.ModelSerializer):
-    quiz = serializers.PrimaryKeyRelatedField(queryset=Quiz.objects.all())  # Hanya menampilkan ID quiz
-    answers = AnswerSerializer(many=True)
-    question_type = serializers.CharField(source='get_question_type_display')
+    quiz = serializers.PrimaryKeyRelatedField(queryset=Quiz.objects.all()) 
+    answers = AnswerSerializer(many=True)  
 
     class Meta:
         model = Question
-        fields = ['id', 'quiz', 'title', 'question_type', 'is_editable', 'answers']
+        fields = ['id', 'quiz', 'title', 'question_type', 'answers']
 
     def validate(self, data):
-        # Validasi tipe soal dan jawaban
         question_type = data.get('question_type')
         answers = data.get('answers', [])
 
-        if question_type == 'TF' and len(answers) != 1:
-            raise serializers.ValidationError("True/False questions must have exactly one answer.")
+        if question_type == 'TF' and len(answers) != 2:
+            raise serializers.ValidationError("Soal True/False harus memiliki tepat dua jawaban (benar dan salah).")
+
+        if question_type == 'MC':
+            if len(answers) != 4:
+                raise serializers.ValidationError("Soal Multiple Choice harus memiliki tepat 4 jawaban.")
+            
+            correct_answers = sum(1 for answer in answers if answer.get("is_right", False))
+            if correct_answers != 1:
+                raise serializers.ValidationError("Soal Multiple Choice harus memiliki tepat 1 jawaban yang benar.")
+
         return data
 
     def create(self, validated_data):
@@ -67,6 +75,20 @@ class QuestionSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+    
+# class QuizSerializer(serializers.ModelSerializer):
+#     question_count = serializers.SerializerMethodField()
+#     category_display = serializers.CharField(source='get_category_display', read_only=True)  
+#     author_name = serializers.CharField(source="author.username", read_only=True)
+#     questions = QuestionSerializer(many=True)
+
+#     class Meta:
+#         model = Quiz
+#         fields = ['id', 'author', 'author_name', 'title', 'description', 'category', 'category_display', 'created_at', 'question_count', 'is_editable', 'questions']
+#         extra_kwargs = {"author": {"read_only": True}}
+
+#     def get_question_count(self, obj):
+#         return str(obj.questions.count())
 
 class SubmissionSerializer(serializers.ModelSerializer):
     user = serializers.CharField(source='user.username', read_only=True)  # Menampilkan username user

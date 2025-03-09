@@ -22,8 +22,12 @@ class Quiz(models.Model):
     is_editable = models.BooleanField(default=True)
 
     @property
+    def author_name(self):
+        return self.author.username
+
+    @property
     def question_count(self):
-        return self.questions.count()
+        return str(self.questions.count())
     
     class Meta:
         verbose_name = "Quiz"
@@ -43,7 +47,8 @@ class Question(models.Model):
     quiz = models.ForeignKey(Quiz, related_name='questions', on_delete=models.CASCADE)
     title = models.CharField(max_length=255, default="")
     question_type = models.CharField(max_length=2, choices=QUESTION_TYPES, default='MC')
-    is_editable = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = "Question"
@@ -57,6 +62,9 @@ class Answer(models.Model):
     question = models.ForeignKey(Question, related_name="answers", on_delete=models.CASCADE)
     answer_text = models.CharField(max_length=255, null=True, blank=True)
     is_right = models.BooleanField(default=False, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
 
     class Meta:
         verbose_name = "Answer"
