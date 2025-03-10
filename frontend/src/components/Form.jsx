@@ -28,12 +28,11 @@ function Form({ route, method }) {
                 setIsAuthenticated(true);
     
                 console.log("Memanggil get_username...");
-                await get_username(); // Pastikan username diperbarui sebelum pindah halaman
+                await get_username(); 
     
                 console.log("Navigasi ke home...");
                 navigate("/");
-                window.location.reload(); // Paksa refresh agar username langsung muncul
-            } else {
+                window.location.reload(); 
                 navigate("/login");
             }
         } catch (error) {

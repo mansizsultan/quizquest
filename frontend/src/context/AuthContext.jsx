@@ -53,8 +53,8 @@ export function AuthProvider({ children }) {
 
     useEffect(() => {
         console.log("AuthContext diperbarui! isAuthenticated:", isAuthenticated, "username:", username);
-    }, [isAuthenticated, username]); // Log setiap kali state berubah
-
+    }, [isAuthenticated, username]); 
+    
     return (
         <AuthContext.Provider value={{ isAuthenticated, username, setIsAuthenticated, get_username }}>
             {children}

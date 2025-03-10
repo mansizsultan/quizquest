@@ -1,9 +1,8 @@
 // src/components/QuizCard.jsx
-import React from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const QuizCard = ({ quiz }) => {
-  // Function untuk mendapatkan label kategori dari kode
   const getCategoryLabel = (categoryCode) => {
     const categories = {
       'PU': 'Pengetahuan Umum',
@@ -27,8 +26,11 @@ const QuizCard = ({ quiz }) => {
             {getCategoryLabel(quiz.category)}
           </span>
         </div>
-        <p className="text-gray-600 mt-2">{quiz.description}</p>
-        <p className="text-gray-500 mt-2">Jumlah soal: {quiz.questionCount}</p>
+        <div className="flex justify-between items-center mt-2">
+          <p className="text-gray-500">Jumlah soal: {quiz.question_count}</p>
+          <p className="text-gray-500">Oleh: {quiz.author_name}</p>
+        </div>
+
         <div className="mt-4 flex space-x-2">
           <Link
             to={`/quiz/${quiz.id}`}
@@ -36,12 +38,14 @@ const QuizCard = ({ quiz }) => {
           >
             Lihat Detail
           </Link>
+          
           <Link
-            // to={`/quiz/${quiz.id}/start`}
+            to={`/do-quiz/${quiz.id}`}
             className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
           >
             Kerjakan Kuis
           </Link>
+          
         </div>
       </div>
     </div>

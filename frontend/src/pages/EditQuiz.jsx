@@ -1,10 +1,10 @@
-// src/pages/CreateQuiz.jsx
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import api from "../api";
 
-const CreateQuiz = () => {
+const EditQuiz = () => {
   const navigate = useNavigate();
+  const { id } = useParams(); 
 
   const [formData, setFormData] = useState({
     title: "",
@@ -13,7 +13,31 @@ const CreateQuiz = () => {
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchQuizData = async () => {
+      try {
+        setIsLoading(true);
+        const response = await api.get(`/api/quiz/${id}/`);
+        
+        setFormData({
+          title: response.data.title,
+          description: response.data.description,
+          category: response.data.category,
+        });
+        
+        setIsLoading(false);
+      } catch (err) {
+        console.error("Error fetching quiz data:", err);
+        setError("Gagal memuat data kuis. Silakan coba lagi nanti.");
+        setIsLoading(false);
+      }
+    };
+
+    fetchQuizData();
+  }, [id]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -28,6 +52,7 @@ const CreateQuiz = () => {
     setIsSubmitting(true);
     setError(null);
 
+    // Validasi sederhana
     if (!formData.title.trim() || !formData.description.trim()) {
       setError("Judul dan deskripsi tidak boleh kosong!");
       setIsSubmitting(false);
@@ -35,24 +60,33 @@ const CreateQuiz = () => {
     }
 
     try {
-      const response = await api.post("/api/create/quizzes/user/", formData);
-      console.log("Quiz berhasil dibuat:", response.data);
-      const id = response.data.id;
+      await api.patch(`/api/quizzes/update/${id}/`, formData);
       
-      navigate(`/create-question/${id}`);
+      navigate(`/user-quizzes`);
     } catch (err) {
-      console.error("Error creating quiz:", err);
-      setError(err.response?.data?.message || "Terjadi kesalahan saat membuat kuis");
+      console.error("Error updating quiz:", err);
+      setError(err.response?.data?.message || "Terjadi kesalahan saat memperbarui kuis");
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-xl">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-300 to-white">
       <div className="flex flex-col items-center justify-start flex-grow pt-8">
         <div className="w-full max-w-4xl px-4 flex items-center">
-          <Link to="/user-quizzes" className="text-blue-800 mr-4">
+          <Link to={`/user-quizzes`} className="text-blue-800 mr-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -67,7 +101,7 @@ const CreateQuiz = () => {
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
           </Link>
-          <h1 className="text-4xl font-bold text-center text-blue-800">Buat Kuis Baru</h1>
+          <h1 className="text-4xl font-bold text-center text-blue-800">Edit Kuis</h1>
         </div>
 
         <div className="w-full max-w-4xl mt-6 px-4 bg-white p-6 rounded-lg shadow-lg">
@@ -139,7 +173,7 @@ const CreateQuiz = () => {
                 className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-bold"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Memproses..." : "Buat Kuis"}
+                {isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
               </button>
             </div>
           </form>
@@ -149,4 +183,4 @@ const CreateQuiz = () => {
   );
 };
 
-export default CreateQuiz;
+export default EditQuiz;

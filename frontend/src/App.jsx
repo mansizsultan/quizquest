@@ -1,15 +1,21 @@
 import React, { useContext } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { AuthContext } from "./context/AuthContext"; 
-import ProtectedRoute from "./components/ProtectedRoute"; // Import ProtectedRoute
+import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Navbar from "./components/Navbar";
+import Navbar from "./components/navbar";
+import CreateQuestion from "./pages/CreateQuestion";
 import Footer from "./components/Footer";
 import QuizList from "./pages/QuizList";
 import QuizDetail from "./pages/QuizDetail";
 import UserQuiz from "./pages/UserQuiz";
 import CreateQuiz from "./pages/CreateQuiz"; 
+import UserQuizDetail from "./pages/UserQuizDetail"; 
+import DoQuiz from "./pages/DoQuiz";
+import QuizResult from "./pages/QuizResult";
+import QuizHistory from "./pages/QuizHistory";
+import EditQuiz from "./pages/EditQuiz";
 
 const App = () => {
   const { isAuthenticated, username } = useContext(AuthContext);
@@ -75,7 +81,13 @@ const App = () => {
           <Route path="/quizzes" element={<QuizList />} />
           <Route path="/quiz/:id" element={<QuizDetail />} />
           <Route path="/user-quizzes" element={<ProtectedRoute element={<UserQuiz/>} />} />
-          <Route path="/create-quiz" element={<CreateQuiz />} /> 
+          <Route path="/edit-quiz/:id" element={<ProtectedRoute element={<EditQuiz />} />} />
+          <Route path="/create-quiz" element={<ProtectedRoute element={<CreateQuiz />} />} />
+          <Route path="/create-question/:id" element={<ProtectedRoute element={<CreateQuestion />} />} />
+          <Route path="/user/quiz/:id" element={<ProtectedRoute element={<UserQuizDetail />} />} />
+          <Route path="/do-quiz/:id" element={<ProtectedRoute element={<DoQuiz />} />} />
+          <Route path="/quiz-result/:id" element={<ProtectedRoute element={<QuizResult />} />} />
+          <Route path="/quiz-history" element={<ProtectedRoute element={<QuizHistory />} />} />
         </Routes>
 
         {/* FOOTER */}

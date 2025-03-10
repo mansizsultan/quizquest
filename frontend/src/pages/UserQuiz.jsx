@@ -1,36 +1,30 @@
-// src/pages/UserQuiz.jsx
-import React from "react";
+import React, { useState, useEffect, useContext } from "react";
 import UserQuizCard from "../components/UserQuizCard";
 import { Link } from "react-router-dom";
+import api from "../api"; 
+import { AuthContext } from "../context/AuthContext";  
 
 const UserQuiz = () => {
-  // Data kuis dummy yang dibuat oleh user dengan kategori
-  const userQuizzes = [
-    {
-      id: 4,
-      title: "Kuis Python Dasar",
-      description: "Kuis ini berisi soal-soal pemrograman Python dasar.",
-      questionCount: 8,
-      category: "TE", // Teknologi
-      created_at: "2025-02-15"
-    },
-    {
-      id: 5,
-      title: "Kuis Budaya Bali",
-      description: "Kuis ini berisi soal-soal tentang budaya Bali.",
-      questionCount: 12,
-      category: "BU", // Budaya
-      created_at: "2025-02-20"
-    },
-    {
-      id: 6,
-      title: "Kuis Bahasa Inggris Dasar",
-      description: "Kuis ini berisi soal-soal bahasa Inggris untuk pemula.",
-      questionCount: 15,
-      category: "BA", // Bahasa
-      created_at: "2025-02-28"
-    },
-  ];
+  const [userQuizzes, setUserQuizzes] = useState([]);
+  const { isAuthenticated } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const fetchUserQuizzes = async () => {
+        try {
+          const response = await api.get("api/quizzes/user/");
+          setUserQuizzes(response.data);  
+        } catch (error) {
+          console.error("Gagal memuat kuis:", error);
+        }
+      };
+      fetchUserQuizzes();
+    }
+  }, [isAuthenticated]);
+
+  const handleDelete = (quizId) => {
+    setUserQuizzes(userQuizzes.filter((quiz) => quiz.id !== quizId));  
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-300 to-white">
@@ -76,24 +70,17 @@ const UserQuiz = () => {
                 Buat Kuis Baru
             </Link>
         </div>
-        
+
         {userQuizzes.length > 0 ? (
             <div className="w-full max-w-4xl mt-6 px-4">
                 {userQuizzes.map((quiz) => (
-                    <UserQuizCard key={quiz.id} quiz={quiz} />
+                    <UserQuizCard key={quiz.id} quiz={quiz} onDelete={handleDelete} />
                 ))}
             </div>
         ) : (
-            <div className="w-full max-w-4xl mt-16 px-4 text-center">
+            <div className="w-full max-w-4xl mt-8 px-4 text-center">
                 <div className="bg-white p-8 rounded-lg shadow-lg">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Kamu belum membuat kuis</h2>
-                    <p className="text-gray-600 mb-6">Mulai buat kuis pertamamu sekarang dan bagikan pengetahuanmu!</p>
-                    <Link 
-                        to="/create-quiz" 
-                        className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-bold"
-                    >
-                        Buat Kuis Baru
-                    </Link>
+                    <p className="text-gray-500 font-bold">Kamu belum membuat kuis apapun</p>
                 </div>
             </div>
         )}

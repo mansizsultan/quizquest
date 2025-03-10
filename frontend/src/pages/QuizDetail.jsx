@@ -1,11 +1,8 @@
-// src/pages/QuizDetail.jsx
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
+import api from "../api"; // Pastikan api diimpor
 
 const QuizDetail = () => {
-  const { id } = useParams(); // Ambil ID kuis dari URL
-
-  // Function untuk mendapatkan label kategori dari kode
   const getCategoryLabel = (categoryCode) => {
     const categories = {
       'PU': 'Pengetahuan Umum',
@@ -20,39 +17,28 @@ const QuizDetail = () => {
     return categories[categoryCode] || 'Tidak Terkategori';
   };
 
-  // Data kuis dummy dengan tambahan jumlah soal dan kategori
-  const quizzes = [
-    {
-      id: 1,
-      title: "Kuis Matematika Dasar",
-      description: "Kuis ini berisi soal-soal matematika dasar.",
-      author: "John Doe",
-      created_at: "2023-10-01",
-      questionCount: 10,
-      category: "ED" // Edukasi
-    },
-    {
-      id: 2,
-      title: "Kuis Sejarah Indonesia",
-      description: "Kuis ini berisi soal-soal sejarah Indonesia.",
-      author: "Jane Doe",
-      created_at: "2023-10-02",
-      questionCount: 15,
-      category: "PU" // Pengetahuan Umum
-    },
-    {
-      id: 3,
-      title: "Kuis IPA Kelas 6",
-      description: "Kuis ini berisi soal-soal IPA untuk kelas 6 SD.",
-      author: "Alice",
-      created_at: "2023-10-03",
-      questionCount: 20,
-      category: "ED" // Edukasi
-    },
-  ];
+  const { id } = useParams(); 
+  const [quiz, setQuiz] = useState(null); 
+  const [loading, setLoading] = useState(true); 
 
-  // Cari kuis berdasarkan ID
-  const quiz = quizzes.find((q) => q.id === parseInt(id));
+  useEffect(() => {
+    const fetchQuiz = async () => {
+      try {
+        const response = await api.get(`api/quiz/${id}`);  
+        setQuiz(response.data);  
+        setLoading(false);  
+      } catch (error) {
+        console.error("Gagal mengambil detail kuis:", error);
+        setLoading(false);  
+      }
+    };
+
+    fetchQuiz();  
+  }, [id]); 
+
+  if (loading) {
+    return <div className="text-center text-xl">Loading...</div>;  
+  }
 
   if (!quiz) {
     return <div className="text-center text-red-500">Kuis tidak ditemukan!</div>;
@@ -89,22 +75,10 @@ const QuizDetail = () => {
           <p className="text-gray-700">{quiz.description}</p>
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <p className="text-gray-600">Dibuat oleh: {quiz.author}</p>
+              <p className="text-gray-600">Dibuat oleh: <span className="font-semibold">{quiz.author_name}</span></p>
               <p className="text-gray-600">Tanggal dibuat: {quiz.created_at}</p>
-              <p className="text-gray-600">Kategori: {getCategoryLabel(quiz.category)}</p>
             </div>
-            <div>
-              <p className="text-gray-600">Jumlah soal: {quiz.questionCount}</p>
-              <p className="text-gray-600">Estimasi waktu: {quiz.questionCount * 2} menit</p>
-            </div>
-          </div>
-          <div className="mt-6">
-            <Link
-            //   to={`/quiz/${quiz.id}/start`}
-              className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 font-bold"
-            >
-              Kerjakan Kuis
-            </Link>
+              <p className="text-gray-600">Jumlah soal: {quiz.question_count}</p>
           </div>
         </div>
       </div>

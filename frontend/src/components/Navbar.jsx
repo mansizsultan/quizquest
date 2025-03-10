@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext"; // Pastikan Anda mengimpor AuthContext dari file yang sesuai
+import { AuthContext } from "../context/AuthContext"; 
 
 function Navbar() {
   const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
@@ -82,6 +82,7 @@ function Navbar() {
           {isAuthenticated ? (
             <li>
               <Link
+                to="/"
                 onClick={handleLogout}
                 className="
                   bg-red-500 text-white px-6 py-2 font-bold rounded-lg
